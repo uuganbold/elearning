@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>common</module>
         <module>app</module>
         <module>course</module>
         <module>iam</module>
@@ -40,6 +41,11 @@
       <dependencies>
         <dependency>
           <groupId>dev.ub.elearning</groupId>
+          <artifactId>common</artifactId>
+          <version>${project.version}</version>
+        </dependency>    
+        <dependency>
+          <groupId>dev.ub.elearning</groupId>
           <artifactId>course</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -52,6 +58,11 @@
           <groupId>dev.ub.elearning</groupId>
           <artifactId>payment</artifactId>
           <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>0.10.3</version>
         </dependency>
       </dependencies>
     </dependencyManagement>
