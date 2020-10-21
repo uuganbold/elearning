@@ -1,19 +1,23 @@
 package dev.ub.elearning.course.domain.model.course;
 
+import dev.ub.elearning.common.events.ValidationError;
 import dev.ub.elearning.course.domain.model.category.CategoryId;
+import dev.ub.elearning.course.domain.model.course.CourseEvent.CourseCreated;
+import dev.ub.elearning.course.domain.model.course.CourseEvent.PriceUpdated;
 import dev.ub.elearning.course.domain.model.instructor.InstructorId;
-import io.vavr.collection.Seq;
 import io.vavr.control.Either;
-import io.vavr.control.Try;
 import io.vavr.control.Validation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Accessors(fluent = true)
 public class Course {
     
     private CourseId courseId;
@@ -26,16 +30,24 @@ public class Course {
 
     private InstructorId instructorId;
 
-    public static Validation<Seq<String>,Course> create(CourseId id, String title, String description, CategoryId categoryId, InstructorId instructorId){
+
+    public static Either<ValidationError,CourseCreated> create(CourseId id, String title, String description, CategoryId categoryId, InstructorId instructorId){
         return Validation.combine(
             id!=null?Validation.valid(id):Validation.invalid("ID must be given"),
             Title.of(title),
             Description.of(description)
-        ).ap((validId,validTitle,validDescription)->new Course(validId,validTitle,validDescription,Price.NOT_SET,categoryId,instructorId));
+        ).ap((validId,validTitle,validDescription)
+            ->new Course(validId,validTitle,validDescription,Price.NOT_SET,categoryId,instructorId)
+        ).map((course)->CourseCreated.now(course))
+        .mapError(e->ValidationError.of(e))
+        .toEither();
     }
 
-    public void setPrice(int price){
-        Price.of(price);
+    public Either<ValidationError, PriceUpdated> setPrice(int price){
+        return Price.of(price)
+            .map(p->PriceUpdated.now(this.courseId,p))
+            .mapError(err->ValidationError.of(err))
+            .toEither();
     }
 
 }
