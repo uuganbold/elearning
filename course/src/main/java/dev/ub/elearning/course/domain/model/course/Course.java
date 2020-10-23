@@ -31,19 +31,20 @@ public class Course {
     private InstructorId instructorId;
 
 
-    public static Either<ValidationError,CourseCreated> create(CourseId id, String title, String description, CategoryId categoryId, InstructorId instructorId){
+    public static Either<ValidationError,Course> create(CourseId id, String title, String description, CategoryId categoryId, InstructorId instructorId){
         return Validation.combine(
             id!=null?Validation.valid(id):Validation.invalid("ID must be given"),
             Title.of(title),
-            Description.of(description)
-        ).ap((validId,validTitle,validDescription)
-            ->new Course(validId,validTitle,validDescription,Price.NOT_SET,categoryId,instructorId)
-        ).map((course)->CourseCreated.now(course))
-        .mapError(e->ValidationError.of(e))
+            Description.of(description),
+            categoryId!=null?Validation.valid(categoryId):Validation.invalid("Category ID must be given"),
+            instructorId!=null?Validation.valid(instructorId):Validation.invalid("Instructor ID must be given")
+        ).ap((validId,validTitle,validDescription,validCategory, validInstructor)
+            ->new Course(validId,validTitle,validDescription,Price.NOT_SET,validCategory,validInstructor)
+        ).mapError(e->ValidationError.of(e))
         .toEither();
     }
 
-    public Either<ValidationError, PriceUpdated> setPrice(int price){
+    public Either<ValidationError, PriceUpdated> updatePrice(int price){
         return Price.of(price)
             .map(p->PriceUpdated.now(this.courseId,p))
             .mapError(err->ValidationError.of(err))

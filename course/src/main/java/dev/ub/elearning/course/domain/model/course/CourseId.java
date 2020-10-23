@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import lombok.Value;
 
-@Value
+@Value(staticConstructor = "of")
 public class CourseId {
     private UUID courseId;
 }

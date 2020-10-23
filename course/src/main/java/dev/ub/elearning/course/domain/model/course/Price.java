@@ -23,7 +23,7 @@ class Price {
         
         if(price<0) return Validation.invalid("Price should be positive"); 
         if(price>MILLION) return Validation.invalid("Price should be less than a million");
-        if(price%THOUSAND==0) return Validation.invalid("Price should be divisible by a thousand");
+        if(price%THOUSAND!=0) return Validation.invalid("Price should be divisible by a thousand");
 
         return Validation.valid(new Price(price));
     }        

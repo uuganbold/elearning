@@ -5,7 +5,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.Value;
 
-@Value
+@Value(staticConstructor = "of")
 public class CategoryId {
     
     @NonNull String categoryId;
